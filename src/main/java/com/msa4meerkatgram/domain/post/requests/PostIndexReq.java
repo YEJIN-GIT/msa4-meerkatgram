@@ -15,6 +15,6 @@ public record PostIndexReq(
     // 초기값 변경 가능
     public PostIndexReq(Integer page, Integer limit) {
         this.page = (page != null && page > 0) ? page : 1;
-        this.limit = (limit != null && limit > 0) ? limit : 1;
+        this.limit = (limit != null && limit > 0) ? limit : 6;
     }
 }

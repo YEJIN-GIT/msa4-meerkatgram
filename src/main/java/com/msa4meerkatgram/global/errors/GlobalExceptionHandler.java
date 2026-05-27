@@ -5,6 +5,7 @@ package com.msa4meerkatgram.global.errors;
 // -------------------------
 
 import com.msa4meerkatgram.global.Response.GlobalRes;
+import com.msa4meerkatgram.global.errors.custom.NotRegisteredException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -19,6 +20,17 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(NotRegisteredException.class)
+    public ResponseEntity<GlobalRes<String>> notRegisteredHandle(NotRegisteredException e) {
+        return ResponseEntity.status(400).body(
+                GlobalRes.<String>builder()
+                        .code("E01")
+                        .message("로그인 에러")
+                        .data(e.getMessage())
+                        .build()
+        );
+    }
+
     // MethodArgumentTypeMismatchException : 하나의 데이터를 클라이언트로 부터 받을 때 오류
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<GlobalRes<String>> methodArgumentTypeMismatchHandle(MethodArgumentTypeMismatchException e) {
@@ -39,7 +51,8 @@ public class GlobalExceptionHandler {
                         .message("요청 파라미터에 이상이 있습니다.")
                         .data(e.getBindingResult()
                                 .getAllErrors()
-                                .stream().map(ObjectError::getDefaultMessage)
+                                // .stream().map(ObjectError::getDefaultMessage)
+                                .stream().map(item -> String.format("%s :잘못된 값입니다.", item.getObjectName()))
                                 .toList()
                         )
                         .build()

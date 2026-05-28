@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/test")
-    public ResponseEntity<GlobalRes<AuthRes>> test() {
-
-        return ResponseEntity.status(200).body(
-                GlobalRes.<AuthRes>builder()
-                    .code("00")
-                    .message("정상 처리")
-                    .data(userService.test())
-                    .build()
-        );
-    }
+    // @GetMapping("/test")
+    // public ResponseEntity<GlobalRes<AuthRes>> test() {
+    //
+    //     return ResponseEntity.status(200).body(
+    //             GlobalRes.<AuthRes>builder()
+    //                 .code("00")
+    //                 .message("정상 처리")
+    //                 .data(userService.test())
+    //                 .build()
+    //     );
+    // }
 }

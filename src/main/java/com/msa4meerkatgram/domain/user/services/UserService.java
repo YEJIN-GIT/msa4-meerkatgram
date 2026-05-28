@@ -13,15 +13,15 @@ public class UserService {
     private final UserMapper userMapper;
     private final JwtProvider jwtProvider;
 
-    public AuthRes test() {
-        User user = userMapper.findByPk(17);
-
-        String newAccessToken = jwtProvider.generateAccessToken(user);
-        String newRefreshToken = jwtProvider.generateRefreshToken(user);
-        System.out.println("::::::::newRefreshToken:" + newRefreshToken);
-        return AuthRes.builder()
-                .user(user)
-                .accessToken(newAccessToken)
-                .build();
-    }
+    // public AuthRes test() {
+    //     User user = userMapper.findByPk(17);
+    //
+    //     String newAccessToken = jwtProvider.generateAccessToken(user);
+    //     String newRefreshToken = jwtProvider.generateRefreshToken(user);
+    //     System.out.println("::::::::newRefreshToken:" + newRefreshToken);
+    //     return AuthRes.builder()
+    //             .user(user)
+    //             .accessToken(newAccessToken)
+    //             .build();
+    // }
 }

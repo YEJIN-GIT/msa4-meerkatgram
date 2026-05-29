@@ -1,13 +1,18 @@
 package com.msa4meerkatgram.global.security.jwt;
 
 import com.msa4meerkatgram.domain.user.entities.User;
-import io.jsonwebtoken.Jwts;
+import com.msa4meerkatgram.global.errors.custom.InvalidTokenException;
+import com.msa4meerkatgram.global.security.cookie.CookieManager;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Optional;
 
 // bean : 스프링이 자동으로 인스턴스화 하여 관리해주는 객체
 // @Component 어노테이션 : bean 으로 자동 등록 해준다.
@@ -15,10 +20,12 @@ import java.util.Date;
 public class JwtProvider {
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
+    private final CookieManager cookieManager;
 
-    public JwtProvider(JwtConfig jwtConfig) {
+    public JwtProvider(JwtConfig jwtConfig, CookieManager cookieManager) {
         this.jwtConfig = jwtConfig;
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtConfig.secret()));
+        this.cookieManager = cookieManager;
     }
 
     // private 외부 접근 안됨
@@ -45,6 +52,31 @@ public class JwtProvider {
 
     public String generateRefreshToken(User user) {
         return this.generateToken(user, jwtConfig.refreshTokenExpiry());
+    }
+
+    // 쿠키에서 리프래쉬 토큰 획득
+    public Optional<String> extractRefreshToken(HttpServletRequest request) {
+        return cookieManager.getCookie(request, jwtConfig.refreshTokenCookieName())
+            .map(Cookie::getValue);
+    }
+
+    // 토큰 검증 및 클래임 추출 : JJWT라이브러리는 클래임 추출과 검증을 같이 해버림
+    public Claims extractClaims(String token) {
+        try {
+            return Jwts.parser()
+                .verifyWith(this.secretKey)
+                .build()
+                .parseSignedClaims(token)   // 클래임의 유효성과 분해
+                .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new InvalidTokenException("토큰이 만료됐습니다.");
+        } catch (UnsupportedJwtException e) {
+            throw new InvalidTokenException("서명이 위조된 토큰입니다.");
+        } catch (MalformedJwtException e) {
+            throw new InvalidTokenException("토큰 형식이 옳바르지 않습니다.");
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException("토큰 검증에 실패했습니다.");
+        }
     }
 
 }

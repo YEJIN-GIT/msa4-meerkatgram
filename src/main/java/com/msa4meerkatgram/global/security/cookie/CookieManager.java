@@ -21,6 +21,12 @@ public class CookieManager {
     // ---------------------------------------------------
     // Optional : null 반환 가능성에 대해 팀원이 알고 있어야 한다!!  자바에서 에러 위험
     //           개발자에게 null 처리 오류 대해 Optional 객체로 감싸주어 IDE가 빨간줄로 알려준다.
+    /**
+     * request Header에서 특정 쿠키를 획득(Optional 반환) 메소드
+     * @param request 리퀘스트
+     * @param name 찾고자하는 쿠키명
+     * @return Optional<Cookie>
+     */
     public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         // case1. 쿠키배열에 값이 없는 경우
         if(request.getCookies() == null) {

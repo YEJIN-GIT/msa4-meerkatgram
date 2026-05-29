@@ -2,6 +2,9 @@ package com.msa4meerkatgram.global.security.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * 환경설정파일 application.yaml에 있는 키들을 가져온다.
+ */
 @ConfigurationProperties(prefix = "security.jwt")
 public record JwtConfig(
     boolean secure,

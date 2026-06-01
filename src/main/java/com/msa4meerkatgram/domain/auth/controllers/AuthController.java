@@ -4,11 +4,13 @@ import com.msa4meerkatgram.domain.auth.requests.LoginReq;
 import com.msa4meerkatgram.domain.auth.responses.AuthRes;
 import com.msa4meerkatgram.domain.auth.services.AuthService;
 import com.msa4meerkatgram.global.Response.GlobalRes;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +47,21 @@ public class AuthController {
                         .message("토큰 재발급 완료")
                         .data(authService.reissue(request, response))
                         .build()
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<GlobalRes<String>> logout(
+        HttpServletResponse response
+        , @AuthenticationPrincipal Claims claims    // 스프링 시큐리티에서 토큰을 분해했었고, 저장한 클래임 객체를 가져온다.
+    ) {
+        authService.logout(response, Long.parseLong(claims.getSubject()));
+
+        return ResponseEntity.status(200).body(
+            GlobalRes.<String>builder()
+                    .code("00")
+                    .message("로그아웃 완료")
+                    .build()
         );
     }
 }

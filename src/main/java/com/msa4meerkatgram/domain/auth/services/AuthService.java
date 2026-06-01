@@ -14,7 +14,10 @@ import com.msa4meerkatgram.global.security.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 @Service
@@ -25,7 +28,9 @@ public class AuthService {
     private final AuthMapper authMapper;
     private final CookieManager cookieManager;
     private final JwtConfig jwtConfig;
+    private final PasswordEncoder passwordEncoder;
 
+    // @Transactional   하나의 update 문이라서 트랜젝션을 굳이 묶지 않았다.
     public AuthRes login(HttpServletResponse response, LoginReq loginReq) {
         // 유저정보 획득
         User user = userMapper.findByEmail(loginReq.email());
@@ -37,6 +42,9 @@ public class AuthService {
         }
 
         // 비밀번호 체크
+        if(!passwordEncoder.matches(loginReq.password(), user.getPassword())) {
+            throw new NotRegisteredException("아이디와 비밀번호를 확인해주세요."); // 보안상 아이디와 비밀번호를 둘다 확인해달고 뭉뚱그려 메시지 사용한다.
+        }
 
         return this.generateAuthentication(response, user);
     }
@@ -101,4 +109,19 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional(rollbackFor = Exception.class)   // 런타입 익셉션을 보통 롤백이 안일어나기 때문에, rollbackFor = Exception.class로 하여 어떠한 예외가 발생하더라도 롤백한다.
+    public void logout(HttpServletResponse response, Long id) {
+        // 유저 정보 획득
+        User user = userMapper.findByPk(id);
+
+        if(user == null) {
+            throw new InvalidTokenException("유효하지 않은 회원의 토큰입니다.");
+        }
+
+        // DB에 저장한 리프래시 토큰 파기
+        authMapper.updateRefreshToken(user.getId(), null);
+
+        // Cookie에 지정한 리프래시 토큰 파기
+        cookieManager.setCookie(response, jwtConfig.refreshTokenCookieName(), null, 0, jwtConfig.reissUri());
+    }
 }

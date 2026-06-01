@@ -43,9 +43,13 @@ security:
     scheme: Bearer
     reiss-uri: /api/reissue-token
 
-# config
+# file
 file:
   server-uri: http://localhost:8080
   storage-path: D:/workspace/msa4-meerkatgram/storage
   profile-path: /images/profiles
   post-path: /images/posts
+
+cors:
+  allowed-origins: ["http://localhost:5173"]
+  max-age: 3600

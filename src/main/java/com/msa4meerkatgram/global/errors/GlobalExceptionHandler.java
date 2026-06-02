@@ -5,6 +5,7 @@ package com.msa4meerkatgram.global.errors;
 // -------------------------
 
 import com.msa4meerkatgram.global.Response.GlobalRes;
+import com.msa4meerkatgram.global.errors.custom.DeletedRecordException;
 import com.msa4meerkatgram.global.errors.custom.InvalidTokenException;
 import com.msa4meerkatgram.global.errors.custom.NotRegisteredException;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<GlobalRes<String>> accessDeniedHandle(AccessDeniedException e) {
-        return ResponseEntity.status(403).body(
+        return ResponseEntity.status(404).body(
                 GlobalRes.<String>builder()
                         .code("E03")
                         .message("UNAUTHORIZED_ERROR")
@@ -66,6 +67,18 @@ public class GlobalExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(DeletedRecordException.class)
+    public ResponseEntity<GlobalRes<String>> deletedRecordHandle(DeletedRecordException e) {
+        return ResponseEntity.status(401).body(
+                GlobalRes.<String>builder()
+                        .code("E10")
+                        .message("DELETED_RECORD_ERROR")
+                        .data(e.getMessage())
+                        .build()
+        );
+    }
+
 
     // MethodArgumentTypeMismatchException : 하나의 데이터를 클라이언트로 부터 받을 때 오류
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

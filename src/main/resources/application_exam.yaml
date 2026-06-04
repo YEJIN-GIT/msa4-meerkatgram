@@ -4,6 +4,12 @@ spring:
   web:
     error:
       include-stacktrace:
+
+  servlet:
+    multipart:
+      max-file-size:
+      max-request-size:
+
   # MySQL
   datasource:
     url:
@@ -26,4 +32,31 @@ logging:
     root:
 
     # 특정 패키지만 로그 출력 레벨 설정
-    com.msa4meerketgram.controllers:
+    com.msa4meerkatgram.controllers:
+
+# Security & JWT
+security:
+  jwt:
+    secure:
+    issuer:
+    type:
+    access-token-expiry:
+    refresh-token-expiry:
+    refresh-token-cookie-name:
+    refresh-token-cookie-expiry:
+    secret:
+    header-key:
+    scheme:
+    reiss-uri:
+
+# file
+file:
+  server-uri:
+  storage-path:
+  profile-path:
+  post-path:
+  allow-extension-list:
+
+cors:
+  allowed-origins:
+  max-age:

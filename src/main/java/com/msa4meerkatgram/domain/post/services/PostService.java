@@ -2,6 +2,7 @@ package com.msa4meerkatgram.domain.post.services;
 
 import com.msa4meerkatgram.domain.post.entities.Post;
 import com.msa4meerkatgram.domain.post.mapper.PostMapper;
+import com.msa4meerkatgram.domain.post.requests.PostStoreReq;
 import com.msa4meerkatgram.domain.post.requests.PostIndexReq;
 import com.msa4meerkatgram.domain.post.responses.PostIndexRes;
 import com.msa4meerkatgram.global.errors.custom.DeletedRecordException;
@@ -42,5 +43,21 @@ public class PostService {
         }
 
         return post;
+    }
+
+    public Post store(PostStoreReq postStoreReq) {
+        Post post = Post.builder()
+            .userId(postStoreReq.userId())
+            .content(postStoreReq.content())
+            .image(postStoreReq.image())
+            .build();
+        postMapper.store(post);
+
+        return postMapper.findByPk(post.getId());
+    }
+
+    public void deletePosts(long id) {
+        int result = postMapper.deletePosts(id);
+        // System.out.println("삭제 건수:" + result); // TODO 지우기
     }
 }

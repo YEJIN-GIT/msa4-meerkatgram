@@ -48,4 +48,27 @@
                 deleted_at IS NULL
             AND user_id = #{userId}
     </select>
+
+    <insert id="store"
+            parameterType="com.msa4meerkatgram.domain.post.entities.Post"
+            keyProperty="id"
+            useGeneratedKeys="true"
+    >
+        INSERT INTO posts(
+            user_id
+            ,content
+            ,image
+        ) VALUES (
+            #{userId}
+            ,#{content}
+            ,#{image}
+        )
+    </insert>
+
+    <update id="deletePosts">
+        UPDATE posts SET
+            deleted_at = NOW()  /* 논리적 삭제 */
+        WHERE
+            id = #{id}
+    </update>
 </mapper>

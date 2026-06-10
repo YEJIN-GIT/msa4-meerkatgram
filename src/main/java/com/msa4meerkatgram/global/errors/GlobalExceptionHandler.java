@@ -7,6 +7,7 @@ package com.msa4meerkatgram.global.errors;
 import com.msa4meerkatgram.global.Response.GlobalRes;
 import com.msa4meerkatgram.global.errors.custom.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -84,7 +85,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<GlobalRes<String>> duplicatedRecordHandle(DuplicatedRecordException e) {
         return ResponseEntity.status(409).body(
                 GlobalRes.<String>builder()
-                        .code("E20")
+                        .code("E11")
                         .message("DUPLICATED_RECORD_ERROR")
                         .data(e.getMessage())
                         .build()
@@ -136,12 +137,26 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // MyBatis를 안 거치는 순수 JDBC 에러
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<GlobalRes<String>> sqlHandle(SQLException e) {
         log.error("DB 에러: ", e);
         return ResponseEntity.status(500).body(
                 GlobalRes.<String>builder()
                         .code("E80")
+                        .message("DB 에러")
+                        .data("현재 서비스 이용이 불가합니다. 잠시후 다시 시도해 주십시오.")
+                        .build()
+        );
+    }
+
+    // TODO : 모든 Spring DB 에러
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<GlobalRes<String>> dataAccessHandle(DataAccessException e) {
+        log.error("DB 에러: ", e);
+        return ResponseEntity.status(500).body(
+                GlobalRes.<String>builder()
+                        .code("E81")
                         .message("DB 에러")
                         .data("현재 서비스 이용이 불가합니다. 잠시후 다시 시도해 주십시오.")
                         .build()

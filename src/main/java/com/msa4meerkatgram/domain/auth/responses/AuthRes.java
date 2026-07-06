@@ -1,6 +1,5 @@
 package com.msa4meerkatgram.domain.auth.responses;
 
-import com.msa4meerkatgram.domain.user.entities.User;
 import com.msa4meerkatgram.domain.user.responses.UserRes;
 import lombok.Builder;
 

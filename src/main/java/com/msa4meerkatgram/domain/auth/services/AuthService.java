@@ -5,7 +5,7 @@ import com.msa4meerkatgram.domain.auth.requests.LoginReq;
 import com.msa4meerkatgram.domain.auth.requests.RegistrationReq;
 import com.msa4meerkatgram.domain.auth.responses.AuthRes;
 import com.msa4meerkatgram.domain.post.mapper.PostMapper;
-import com.msa4meerkatgram.domain.user.entities.User;
+import com.msa4meerkatgram.domain.user.entities.UserMybatis;
 import com.msa4meerkatgram.domain.user.mapper.UserMapper;
 import com.msa4meerkatgram.domain.user.responses.UserRes;
 import com.msa4meerkatgram.global.errors.custom.DuplicatedRecordException;
@@ -39,7 +39,7 @@ public class AuthService {
     // @Transactional   하나의 update 문이라서 트랜젝션을 굳이 묶지 않았다.
     public AuthRes login(HttpServletResponse response, LoginReq loginReq) {
         // 유저정보 획득
-        User user = userMapper.findByEmail(loginReq.email());
+        UserMybatis user = userMapper.findByEmail(loginReq.email());
         // MyBatis 는 결과가 없으면 null 반환한다.
 
         // 유저 가입 여부 확인
@@ -66,7 +66,7 @@ public class AuthService {
         long id = Long.parseLong(jwtProvider.extractClaims(extractRefreshToken).getSubject());
 
         // 유저정보 획득
-        User user = userMapper.findByPk(id);
+        UserMybatis user = userMapper.findByPk(id);
         // MyBatis 는 결과가 없으면 null 반환한다.
 
         // 유저 가입 여부 확인
@@ -89,7 +89,7 @@ public class AuthService {
      * @param user 유저 Entity
      * @return AuthRes
      */
-    private AuthRes generateAuthentication(HttpServletResponse response, User user) {
+    private AuthRes generateAuthentication(HttpServletResponse response, UserMybatis user) {
         // 작성 게시글 수 획등
         long countPosts = postMapper.countPostsByUserId(user.getId());
 
@@ -123,7 +123,7 @@ public class AuthService {
     @Transactional(rollbackFor = Exception.class)   // 런타입 익셉션을 보통 롤백이 안일어나기 때문에, rollbackFor = Exception.class로 하여 어떠한 예외가 발생하더라도 롤백한다.
     public void logout(HttpServletResponse response, Long id) {
         // 유저 정보 획득
-        User user = userMapper.findByPk(id);
+        UserMybatis user = userMapper.findByPk(id);
 
         if(user == null) {
             throw new InvalidTokenException("유효하지 않은 회원의 토큰입니다.");
@@ -139,13 +139,13 @@ public class AuthService {
     @Transactional(rollbackFor = Exception.class)
     public void registration(RegistrationReq registrationReq) {
         // 이미 가입한 회원인지 체크
-        User user = userMapper.findByEmail(registrationReq.email());
+        UserMybatis user = userMapper.findByEmail(registrationReq.email());
 
         if(user != null) {
             throw new DuplicatedRecordException("이미 가입된 회원입니다.");
         }
 
-        User newUser = new User();
+        UserMybatis newUser = new UserMybatis();
         newUser.setEmail(registrationReq.email());
         newUser.setPassword(passwordEncoder.encode(registrationReq.password()));
         newUser.setNick(registrationReq.nick());

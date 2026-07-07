@@ -53,7 +53,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<GlobalRes<String>> logout(
-        HttpServletResponse response
+            HttpServletResponse response
         , @AuthenticationPrincipal Claims claims    // 스프링 시큐리티에서 토큰을 분해했었고, 저장한 클래임 객체를 가져온다.
     ) {
         authService.logout(response, Long.parseLong(claims.getSubject()));

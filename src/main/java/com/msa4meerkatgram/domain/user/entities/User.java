@@ -26,7 +26,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // PK 자동 생성 전략
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")  // columnDefinition : 별도 데이터베이스의 데이터타입 지정. 없으면 엔티티의 테이터 타입을 보고 JPA가 유추하여 BIGINT로 생성됨.
-    private long id;
+    private Long id;
 
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;

@@ -1,46 +1,40 @@
 package com.msa4meerkatgram.domain.post.services;
 
-import com.msa4meerkatgram.domain.post.entities.PostMybatis;
-import com.msa4meerkatgram.domain.post.mapper.PostMapper;
-import com.msa4meerkatgram.domain.post.requests.PostIndexReq;
-import com.msa4meerkatgram.domain.post.responses.PostIndexRes;
+import com.msa4meerkatgram.domain.post.entities.Post;
+import com.msa4meerkatgram.domain.post.repositories.PostRespository;
+import com.msa4meerkatgram.domain.post.responses.PostWithUserRes;
 import com.msa4meerkatgram.global.errors.custom.DeletedRecordException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final PostMapper postMapper;
+    private final PostRespository postRespository;
 
-    public PostIndexRes index(PostIndexReq postIndexReq) {
-        // 특정 페이지의 게시글 조회
-        int offet = (postIndexReq.page() - 1 ) * postIndexReq.limit();
+//    public PostIndexRes index(PostIndexReq postIndexReq) {
+//        // 특정 페이지의 게시글 조회
+//        int offet = (postIndexReq.page() - 1 ) * postIndexReq.limit();
+//
+//        List<PostMybatis> posts = postMapper.getPagination(postIndexReq.limit(), offet);
+//
+//        // 토탈 획득 (부하발생)
+//        long total = postMapper.getTotal();
+//        boolean lastPage = offet + postIndexReq.limit() >= total;
+//
+//        // 컨트롤러 전달
+//        return PostIndexRes.builder()
+//                .total(total)
+//                .lastPage(lastPage)
+//                .posts(posts)
+//                .build();
+//
+//    }
 
-        List<PostMybatis> posts = postMapper.getPagination(postIndexReq.limit(), offet);
+    public PostWithUserRes show(long id) {
+        Post result = postRespository.findById(id)  // 리턴타입이 Optional<T>
+            .orElseThrow(() -> new DeletedRecordException("이미 삭제된 게시글입니다."));   // Optional<T> 결과가 null일 경우에 ()안에 것을 실행하겠다
 
-        // 토탈 획득 (부하발생)
-        long total = postMapper.getTotal();
-        boolean lastPage = offet + postIndexReq.limit() >= total;
-
-        // 컨트롤러 전달
-        return PostIndexRes.builder()
-                .total(total)
-                .lastPage(lastPage)
-                .posts(posts)
-                .build();
-
-    }
-
-    public PostMybatis show(long id) {
-        PostMybatis post = postMapper.findByPk(id);
-
-        if(post == null) {   // 해당 게시글 존재 여부 (그사이 게시자가 삭제할 수도 있는 경우)
-            throw new DeletedRecordException("이미 삭제된 게시글입니다.");
-        }
-
-        return post;
+        return PostWithUserRes.from(result);
     }
 }

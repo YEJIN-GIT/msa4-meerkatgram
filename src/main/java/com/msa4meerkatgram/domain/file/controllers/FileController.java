@@ -3,7 +3,7 @@ package com.msa4meerkatgram.domain.file.controllers;
 import com.msa4meerkatgram.domain.file.responses.FileRes;
 import com.msa4meerkatgram.domain.file.services.FileService;
 import com.msa4meerkatgram.global.Response.GlobalRes;
-import com.msa4meerkatgram.global.util.file.fileConfig;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(name = "파일 API", description = "파일 업로드 관련")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

@@ -59,8 +59,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<GlobalErrorRes> invalidTokenHandle(InvalidTokenException e) {
-        log.debug(CustomErrorCode.TOKEN_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.TOKEN_ERROR);
+        log.debug(CustomErrorCode.INVALID_TOKEN_ERROR.name(), e);
+        return this.generateErrorResponse(CustomErrorCode.INVALID_TOKEN_ERROR);
     }
 
     @ExceptionHandler(DeletedRecordException.class)

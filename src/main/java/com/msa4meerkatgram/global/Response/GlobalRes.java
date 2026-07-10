@@ -25,9 +25,9 @@ public record GlobalRes<T>(
     }
     /**
      * 성공 패턴2:데이터가 없는 메소드
-     * @param data
+     * @param
      * @return
-     * @param <T>
+     * @param
      */
     public static GlobalRes<Void> success() {
         return GlobalRes.<Void>from(CustomResponseCode.SUCCESS);

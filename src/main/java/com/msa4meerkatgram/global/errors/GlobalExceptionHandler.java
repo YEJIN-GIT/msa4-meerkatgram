@@ -1,11 +1,7 @@
 package com.msa4meerkatgram.global.errors;
 
-// -------------------------
-// 커스텀한 예외처리 위한 객체
-// -------------------------
-
-import com.msa4meerkatgram.global.Response.GlobalErrorRes;
-import com.msa4meerkatgram.global.errors.constant.CustomErrorCode;
+import com.msa4meerkatgram.global.Response.GlobalRes;
+import com.msa4meerkatgram.global.Response.constant.CustomResponseCode;
 import com.msa4meerkatgram.global.errors.custom.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,66 +20,56 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private ResponseEntity<GlobalErrorRes> generateErrorResponse(CustomErrorCode customErrorCode) {
-        return ResponseEntity.status(customErrorCode.getHttpStatus())
-                .body(GlobalErrorRes.from(customErrorCode.getCode(), customErrorCode.name()));
+    private ResponseEntity<GlobalRes<Void>> generateErrorResponse(CustomResponseCode customResponseCode) {
+        return ResponseEntity.status(customResponseCode.getHttpStatus())
+                .body(GlobalRes.<Void>from(customResponseCode));
     }
 
     @ExceptionHandler(NotRegisteredException.class)
-    public ResponseEntity<GlobalErrorRes> notRegisteredHandle(NotRegisteredException e) {
-        //return ResponseEntity.status(401).body(
-        //        GlobalRes.<String>builder()
-        //                .code("E01")
-        //                .message("로그인 에러")
-        //                .data(e.getMessage())
-        //                .build()
-        //);
-
-        //return this.generateErrorResponse(HttpStatus.UNAUTHORIZED, "E01", "LOGIN_ERROR")
-
-        log.debug(CustomErrorCode.NOT_REGISTERED_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.NOT_REGISTERED_ERROR);
+    public ResponseEntity<GlobalRes<Void>> notRegisteredHandle(NotRegisteredException e) {
+        log.debug(CustomResponseCode.NOT_REGISTERED_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.NOT_REGISTERED_ERROR);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<GlobalErrorRes> authenticationHandle(AuthenticationException e) {
-        log.debug(CustomErrorCode.UNAUTHENTICATED_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.UNAUTHENTICATED_ERROR);
+    public ResponseEntity<GlobalRes<Void>> authenticationHandle(AuthenticationException e) {
+        log.debug(CustomResponseCode.UNAUTHENTICATED_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.UNAUTHENTICATED_ERROR);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<GlobalErrorRes> accessDeniedHandle(AccessDeniedException e) {
-        log.debug(CustomErrorCode.UNAUTHORIZED_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.UNAUTHORIZED_ERROR);
+    public ResponseEntity<GlobalRes<Void>> accessDeniedHandle(AccessDeniedException e) {
+        log.debug(CustomResponseCode.UNAUTHORIZED_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.UNAUTHORIZED_ERROR);
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<GlobalErrorRes> invalidTokenHandle(InvalidTokenException e) {
-        log.debug(CustomErrorCode.INVALID_TOKEN_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.INVALID_TOKEN_ERROR);
+    public ResponseEntity<GlobalRes<Void>> invalidTokenHandle(InvalidTokenException e) {
+        log.debug(CustomResponseCode.INVALID_TOKEN_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.INVALID_TOKEN_ERROR);
     }
 
     @ExceptionHandler(DeletedRecordException.class)
-    public ResponseEntity<GlobalErrorRes> deletedRecordHandle(DeletedRecordException e) {
-        log.debug(CustomErrorCode.NOT_FOUND_DATA_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.NOT_FOUND_DATA_ERROR);
+    public ResponseEntity<GlobalRes<Void>> deletedRecordHandle(DeletedRecordException e) {
+        log.debug(CustomResponseCode.NOT_FOUND_DATA_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.NOT_FOUND_DATA_ERROR);
     }
 
     @ExceptionHandler(DuplicatedRecordException.class)
-    public ResponseEntity<GlobalErrorRes> duplicatedRecordHandle(DuplicatedRecordException e) {
-        log.debug(CustomErrorCode.DUPLICATED_DATA_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.DUPLICATED_DATA_ERROR);
+    public ResponseEntity<GlobalRes<Void>> duplicatedRecordHandle(DuplicatedRecordException e) {
+        log.debug(CustomResponseCode.DUPLICATED_DATA_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.DUPLICATED_DATA_ERROR);
     }
 
     // MethodArgumentTypeMismatchException : 하나의 데이터를 클라이언트로 부터 받을 때 오류
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<GlobalErrorRes> methodArgumentTypeMismatchHandle(MethodArgumentTypeMismatchException e) {
-        log.debug(CustomErrorCode.INVALID_PARAMETER_ERROR.name(), String.format("%s : 필드를 확인해 주세요.", e.getName()));
-        return this.generateErrorResponse(CustomErrorCode.INVALID_PARAMETER_ERROR);
+    public ResponseEntity<GlobalRes<Void>> methodArgumentTypeMismatchHandle(MethodArgumentTypeMismatchException e) {
+        log.debug(CustomResponseCode.INVALID_PARAMETER_ERROR.name(), String.format("%s : 필드를 확인해 주세요.", e.getName()));
+        return this.generateErrorResponse(CustomResponseCode.INVALID_PARAMETER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GlobalErrorRes> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
+    public ResponseEntity<GlobalRes<Void>> methodArgumentNotValidHandle(MethodArgumentNotValidException e) {
         Map<String, String> errors = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -93,28 +79,28 @@ public class GlobalExceptionHandler {
                         (existing, replacement) -> existing // 중복 필드가 있을 경우 기존 값 유지
                 ));
 
-        log.debug(CustomErrorCode.INVALID_PARAMETER_ERROR.name(), errors);
-        return this.generateErrorResponse(CustomErrorCode.INVALID_PARAMETER_ERROR);
+        log.debug(CustomResponseCode.INVALID_PARAMETER_ERROR.name(), errors);
+        return this.generateErrorResponse(CustomResponseCode.INVALID_PARAMETER_ERROR);
     }
 
     @ExceptionHandler(FileManagedException.class)
-    public ResponseEntity<GlobalErrorRes> fileManagedHandle(FileManagedException e) {
+    public ResponseEntity<GlobalRes<Void>> fileManagedHandle(FileManagedException e) {
         // log.error("파일 업로드 에러: {}\n{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
-        log.debug(CustomErrorCode.FILE_MANAGED_ERROR.name(), e);
-        return this.generateErrorResponse(CustomErrorCode.FILE_MANAGED_ERROR);
+        log.debug(CustomResponseCode.FILE_MANAGED_ERROR.name(), e);
+        return this.generateErrorResponse(CustomResponseCode.FILE_MANAGED_ERROR);
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<GlobalErrorRes> sqlHandle(SQLException e) {
+    public ResponseEntity<GlobalRes<Void>> sqlHandle(SQLException e) {
         log.error("DB 에러: ", e);
-        return this.generateErrorResponse(CustomErrorCode.DB_ERROR);
+        return this.generateErrorResponse(CustomResponseCode.DB_ERROR);
     }
 
     // Exception : 예기치 못한 모든 에러
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<GlobalErrorRes> otherHandle(Exception e) {
+    public ResponseEntity<GlobalRes<Void>> otherHandle(Exception e) {
         //log.error(String.format("시스템 에러: %s\n%s", e.getMessage(), Arrays.toString(e.getStackTrace())));
         log.error("시스템 에러: ", e);
-        return this.generateErrorResponse(CustomErrorCode.SYSTEM_ERROR);
+        return this.generateErrorResponse(CustomResponseCode.SYSTEM_ERROR);
     }
 }

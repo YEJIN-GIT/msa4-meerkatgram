@@ -3,6 +3,9 @@ package com.msa4meerkatgram.domain.file.controllers;
 import com.msa4meerkatgram.domain.file.responses.FileRes;
 import com.msa4meerkatgram.domain.file.services.FileService;
 import com.msa4meerkatgram.global.Response.GlobalRes;
+import com.msa4meerkatgram.global.Response.constant.CustomResponseCode;
+import com.msa4meerkatgram.global.config.openapi.CustomApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
     private final FileService fileService;
 
+    @Operation(summary = "프로필 파일 처리")
+    @CustomApiResponse(value = {
+            CustomResponseCode.FILE_MANAGED_ERROR
+            ,CustomResponseCode.SYSTEM_ERROR
+    })
     @PostMapping("/files/profiles")
     public ResponseEntity<GlobalRes<FileRes>> storeProfile(
             @ModelAttribute MultipartFile file
@@ -26,6 +34,11 @@ public class FileController {
         return ResponseEntity.ok(GlobalRes.success(fileService.storeProfile(file)));
     }
 
+    @Operation(summary = "게시글 파일 처리")
+    @CustomApiResponse(value = {
+            CustomResponseCode.FILE_MANAGED_ERROR
+            ,CustomResponseCode.SYSTEM_ERROR
+    })
     @PostMapping("/files/posts")
     public ResponseEntity<GlobalRes<FileRes>> storePosts(
             @ModelAttribute MultipartFile file
